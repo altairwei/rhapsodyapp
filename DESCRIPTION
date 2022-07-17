@@ -1,12 +1,12 @@
 Package: rhapsodyapp
-Title: What the Package Does (One Line, Title Case)
+Title: Display and Query Single-Cell Transcriptome Data in a Shiny App
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+    person("Altair", "Wei", , "altair_wei@outlook.com", role = c("aut", "cre"))
+Description: This Shiny application is designed to facilitate the presentation
+    of single cell transcriptome data and also provides a quick and easy way to
+    query data of interest.
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.0
