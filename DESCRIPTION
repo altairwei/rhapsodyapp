@@ -1,6 +1,6 @@
 Package: rhapsodyapp
 Title: Display and Query Single-Cell Transcriptome Data in a Shiny App
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Authors@R: 
     person("Altair", "Wei", , "altair_wei@outlook.com", role = c("aut", "cre"))
 Description: This Shiny application is designed to facilitate the presentation

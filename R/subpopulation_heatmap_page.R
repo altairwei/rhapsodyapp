@@ -27,6 +27,7 @@ subpopulation_heatmap_page_ui <- function(id) {
           inputId = ns("gene_list"),
           label = "Genes to Query:",
           height = "200px",
+          resize = "none",
           placeholder = sprintf(
             paste0("Please enter the list of genes",
             " to be queried, one gene per line. If the number ",

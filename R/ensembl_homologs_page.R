@@ -35,6 +35,7 @@ ensembl_homologs_page_ui <- function(id) {
           inputId = ns("query_gene"),
           label = "Genes to Query:",
           height = "200px",
+          resize = "none",
           placeholder = paste0("Please enter the list of genes",
             " to be queried, one gene per line.")
         ),
