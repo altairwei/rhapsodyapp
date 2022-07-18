@@ -74,6 +74,10 @@ subpopulation_heatmap_page_ui <- function(id) {
   )
 }
 
+# InteractiveComplexHeatmap does not support shiny module, see below:
+#   - https://github.com/jokergoo/InteractiveComplexHeatmap/issues/51
+#   - https://github.com/jokergoo/InteractiveComplexHeatmap/issues/92
+# So, we implemented a simple interactive heatmap module
 subpopulation_heatmap_page <-  function(
   input, output, session, library_list, cache) {
 
@@ -199,7 +203,7 @@ subpopulation_heatmap_page <-  function(
 
   brushed_mat <- shiny::reactive({
     index_list <- brushed_indexes()
-    mat <- dataset()
+    mat <- shiny::isolate(dataset())
     if (shiny::isTruthy(index_list) && shiny::isTruthy(mat))
       mat[index_list$row_index, index_list$col_index, drop = FALSE]
     else
@@ -212,7 +216,7 @@ subpopulation_heatmap_page <-  function(
   shiny::observe({
     ht <- ht_obj_cache()
     ht_pos <- ht_pos_cache()
-    mat <- dataset()
+    mat <- shiny::isolate(dataset())
 
     if (shiny::isTruthy(input$heatmap_click)
           && shiny::isTruthy(ht)
@@ -281,9 +285,6 @@ subpopulation_heatmap_page <-  function(
   # Response
   ####################
 
-  #TODO: 点击和框选事件在更新热图后会失效
-  #TODO: 允许拷贝整个表格，而非特定页
-
   output$heatmap_container <- shiny::renderUI({
     ns <- session$ns
     gene_list <- gene_queries()
@@ -304,7 +305,6 @@ subpopulation_heatmap_page <-  function(
           brush = ns("heatmap_brush"))
       )
     )
-
   })
 
   ht_raw_obj <- shiny::reactive({
@@ -327,17 +327,22 @@ subpopulation_heatmap_page <-  function(
     ht
   })
 
-  output$heatmap <- shiny::renderPlot({
-    ht <- ht_raw_obj()
-    ht <- ComplexHeatmap::draw(ht)
-    ht_obj_cache(ht)
+  output$heatmap <- shiny::renderPlot(
+    {
+      ht <- ht_raw_obj()
+      ht <- ComplexHeatmap::draw(ht)
+      ht_obj_cache(ht)
 
-    ht_pos <- InteractiveComplexHeatmap::htPositionsOnDevice(
-      ht, include_annotation = TRUE, calibrate = FALSE)
-    ht_pos_cache(ht_pos)
+      ht_pos <- InteractiveComplexHeatmap::htPositionsOnDevice(
+        ht, include_annotation = TRUE, calibrate = FALSE)
+      ht_pos_cache(ht_pos)
 
-    ht
-  })
+      ht
+    },
+    # UI updates are lagging behind heatmap drawing, so we need to redraw to
+    # ensure that the heatmap positions are correct.
+    execOnResize = TRUE
+  )
 
   output$sub_heatmap <- shiny::renderPlot({
     index_list <- brushed_indexes()
@@ -347,9 +352,6 @@ subpopulation_heatmap_page <-  function(
     if (shiny::isTruthy(index_list)
           && shiny::isTruthy(ht_list)
           && shiny::isTruthy(subm)) {
-
-      #message("Plot brushed heatmap...")
-      start_time <- Sys.time()
 
       ri <- index_list$row_index
       ci <- index_list$col_index
@@ -389,10 +391,6 @@ subpopulation_heatmap_page <-  function(
       ht_selected_pos <- InteractiveComplexHeatmap::htPositionsOnDevice(
         ht_selected, include_annotation = TRUE, calibrate = FALSE)
       sub_ht_pos_cache(ht_selected_pos)
-
-      end_time <- Sys.time()
-      elapsed <- end_time - start_time
-      #message("Finished plot brushed heatmap in ", elapsed, " secs")
 
       ht_selected
     } else {
