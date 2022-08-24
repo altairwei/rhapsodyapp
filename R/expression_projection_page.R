@@ -266,10 +266,9 @@ expression_projection_page <- function(
     plot_output_id_list <- gene_queries()
     last_queries <<- plot_output_id_list
 
-    reduction <- shiny::isolate(input$reduction)
-
     invisible(lapply(plot_output_id_list, function(gene_id) {
       output[[paste0("scatter-", gene_id)]] <- shiny::renderPlot({
+        reduction <- shiny::isolate(input$reduction)
         data_to_plot <- data_to_plot()
         gene_id_p <- paste0("rna_", gene_id)
         if (gene_id_p %in% names(data_to_plot)) {
